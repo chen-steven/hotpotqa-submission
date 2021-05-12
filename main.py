@@ -3,22 +3,31 @@ from dataset import OneStepBaselineDataset
 from torch.utils.data import DataLoader
 import torch
 import utils
-from transformers import RobertaTokenizerFast
+from transformers import RobertaTokenizerFast, AutoConfig
 import torch.nn.functional as F
 from tqdm import tqdm
 import json
 
+utils.set_device(0)
 def generate_predictions(args):
-    sentence2title = json.load(open(args.sentence_title_file, 'r'))
-    tokenizer = RobertaTokenizerFast.from_pretrained('roberta-large')
-    model = BertSequentialReasoningSingleEncoding(ModelConfig())
-    model.load_state_dict(torch.load('data/model.pt'))
-    model.eval()
+    config = AutoConfig.from_pretrained('roberta-large')
+    config.teacher_forcing = False
+    config.oracle = False
+    config.num_chains = 4
+    config.dev_num_chains = 5
+    config.context_aware_qa = True
+    config.mask_context_embedding = False
 
+    sentence2title = json.load(open('data/sentence2para.json', 'r'))
+    tokenizer = RobertaTokenizerFast.from_pretrained('roberta-large')
+    model = BertSequentialReasoningSingleEncoding(config)
+    model.load_state_dict(torch.load('mask.pt', map_location="cpu"))
+    model.eval()
+    model.cuda()
     dataset = OneStepBaselineDataset(args.features_file)
     dataloader = DataLoader(dataset, shuffle=False, batch_size=1)
 
-    all_predictions = {}
+    all_predictions = {'answer': {}, 'sp': {}}
     with torch.no_grad():
         for batch in tqdm(dataloader):
             features, sentence_indicator, ids = batch
@@ -32,17 +41,21 @@ def generate_predictions(args):
                 pred_ans = tokenizer.decode(features['input_ids'][i].tolist()[start: end + 1])
 
                 pred_chain = [torch.argmax(x, dim=-1)[i].item() for x in chain_logits]
+                pad_idx = sentence_indicator[0][-2]
+                pred_chain = [x for x in pred_chain if x < pad_idx]
                 pred_supporting_facts = []
                 for x in pred_chain:
                     pred_supporting_facts.append(sentence2title[ids[i]][x])
-                pred = {'answer': pred_ans, 'sp': pred_supporting_facts}
-                all_predictions[ids[i]] = pred
+                all_predictions['answer'][ids[i]] = pred_ans
+                all_predictions['sp'][ids[i]] = pred_supporting_facts
 
-    json.dump(all_predictions, open('predict.json', 'w'))
+    json.dump(all_predictions, open('predict2.json', 'w'))
 
 
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('--features-file', type=str)
+    args = parser.parse_args()
+    generate_predictions(args)
 

@@ -44,7 +44,7 @@ def get_examples(file_path, paras_file):
     with open(file_path, 'r', encoding='utf-8') as f:
         data = json.load(f)
         for article in tqdm(data):
-            uid = article["id"]
+            uid = article["_id"]
             question = "yes no. " + article['question']
             context = article["context"]
             assert len(context) >= 2
