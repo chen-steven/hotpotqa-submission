@@ -69,6 +69,7 @@ def get_examples(file_path, paras_file):
     return examples
 
 
+
 def build_hotpot_single_encoding_features(examples, filename):
     tokenizer = RobertaTokenizerFast.from_pretrained('roberta-large')
     ids = []
@@ -87,7 +88,6 @@ def build_hotpot_single_encoding_features(examples, filename):
 
     features = tokenizer(full_context, truncation=True)
     for i, example in tqdm(enumerate(examples)):
-
         sentence_indicator = [0] * len(features['input_ids'][i])
         sent_idx = 0
 
@@ -102,7 +102,6 @@ def build_hotpot_single_encoding_features(examples, filename):
     data = dict(features=features,
                 sentence_indicators=sentence_indicators,
                 ids=ids)
-
     pickle.dump(data, open(filename, 'wb'))
 
 

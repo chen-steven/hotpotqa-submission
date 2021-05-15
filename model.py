@@ -83,11 +83,8 @@ class BertSequentialReasoningSingleEncoding(nn.Module):
             else:
                 one_hot = F.gumbel_softmax(sentence_logits, tau=0.8, hard=True)
         else:
-            if self.config.oracle and fact_label is not None:
-                one_hot = utils.convert_to_one_hot(fact_label, num_sentences)
-            else:
-                one_hot = torch.argmax(sentence_logits, dim=-1)
-                one_hot = utils.convert_to_one_hot(one_hot, num_sentences)
+            one_hot = torch.argmax(sentence_logits, dim=-1)
+            one_hot = utils.convert_to_one_hot(one_hot, num_sentences)
 
         if one_hot[0][-1] != 1:  # ONLY FOR BATCH SIZE 1
             selected_sentence_mask = (1 - one_hot) * selected_sentence_mask
