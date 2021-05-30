@@ -52,9 +52,10 @@ def get_examples(file_path, paras_file):
 
             selected_paras = []
             for title, sents in context:
-                if title in paras[uid]:
+                if title in paras[uid][:3]:
                     context_sents.extend(sents)
                     selected_paras.append((title, sents))
+
 
             for title, sents in selected_paras:
                 for i in range(len(sents)):
@@ -111,4 +112,4 @@ if __name__ == "__main__":
     parser.add_argument('--dataset-file', type=str)
     args = parser.parse_args()
     examples = get_examples(args.dataset_file, "data/paras.json")
-    build_hotpot_single_encoding_features(examples, "data/features.pkl")
+    build_hotpot_single_encoding_features(examples, "data/features_fixed.pkl")

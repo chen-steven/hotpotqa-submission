@@ -1,4 +1,4 @@
-from model import BertSequentialReasoningSingleEncoding, ModelConfig
+from model import BertSequentialReasoningSingleEncoding
 from dataset import OneStepBaselineDataset
 from torch.utils.data import DataLoader
 import torch
@@ -17,11 +17,12 @@ def generate_predictions(args):
     config.dev_num_chains = 5
     config.context_aware_qa = True
     config.mask_context_embedding = False
+    config.beam_search = False
 
     sentence2title = json.load(open('data/sentence2para.json', 'r'))
     tokenizer = RobertaTokenizerFast.from_pretrained('roberta-large')
     model = BertSequentialReasoningSingleEncoding(config)
-    model.load_state_dict(torch.load('mask.pt', map_location="cpu"))
+    model.load_state_dict(torch.load('data/model.pt', map_location="cpu"))
     model.eval()
     model.cuda()
     dataset = OneStepBaselineDataset(args.features_file)
@@ -49,7 +50,7 @@ def generate_predictions(args):
                 all_predictions['answer'][ids[i]] = pred_ans
                 all_predictions['sp'][ids[i]] = pred_supporting_facts
 
-    json.dump(all_predictions, open('predict2.json', 'w'))
+    json.dump(all_predictions, open('predict_fixed_data.json', 'w'))
 
 
 if __name__ == "__main__":

@@ -39,7 +39,7 @@ class BertSequentialReasoningSingleEncoding(nn.Module):
         output = self.bert(**features)
         question_embedding = None
         question_len = None
-        for i in range(sentence_indicator[0][-1]):
+        for i in range(sentence_indicator[0][-2] + 1):
             mask = (sentence_indicator == i).long().cuda()
             sentence_embedding = torch.sum(output[0] * mask.unsqueeze(-1), dim=1)
             sentence_len = mask.sum(dim=1).view(-1, 1)
