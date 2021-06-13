@@ -207,7 +207,8 @@ if __name__ == "__main__":
     config_class, model_class, tokenizer_class = MODEL_CLASSES[args.model_type]
     config = config_class.from_pretrained(args.config_name if args.config_name else args.model_name_or_path,
                                           num_labels=num_labels,
-                                          finetuning_task=args.task_name)
+                                          finetuning_task=args.task_name,
+                                          cache_dir="feature_extraction_cache")
     tokenizer = tokenizer_class.from_pretrained(args.tokenizer_name if args.tokenizer_name else args.model_name_or_path,
                                                 do_lower_case=args.do_lower_case)
 
@@ -216,7 +217,8 @@ if __name__ == "__main__":
     model_state_dict = torch.load(args.eval_ckpt, map_location="cuda:1")
     model = model_class.from_pretrained(args.model_name_or_path,
                                         config=config,
-                                        state_dict=model_state_dict)
+                                        state_dict=model_state_dict,
+                                        cache_dir="feature_extraction_cache")
 
     model.cuda()
     if args.fp16:

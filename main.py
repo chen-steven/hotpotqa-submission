@@ -22,7 +22,7 @@ def generate_predictions(args):
     sentence2title = json.load(open('data/sentence2para.json', 'r'))
     tokenizer = RobertaTokenizerFast.from_pretrained('roberta-large')
     model = BertSequentialReasoningSingleEncoding(config)
-    model.load_state_dict(torch.load('data_processed/model.pt', map_location="cpu"))
+    model.load_state_dict(torch.load('model.pt', map_location="cpu"))
     model.eval()
     model.cuda()
     dataset = OneStepBaselineDataset(args.features_file)
@@ -50,7 +50,7 @@ def generate_predictions(args):
                 all_predictions['answer'][ids[i]] = pred_ans
                 all_predictions['sp'][ids[i]] = pred_supporting_facts
 
-    json.dump(all_predictions, open('predict_fixed_data.json1', 'w'))
+    json.dump(all_predictions, open('pred.json', 'w'))
 
 
 if __name__ == "__main__":
