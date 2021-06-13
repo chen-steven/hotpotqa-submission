@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 from transformers import AutoModel, AutoTokenizer
 import torch.nn.functional as F
-import utils
+import util
 from transformers import RobertaConfig
 from dataclasses import dataclass
 
@@ -64,7 +64,7 @@ class BertSequentialReasoningSingleEncoding(nn.Module):
 
         pooled_embeddings = combined_sentence_embeddings / combined_sentence_len
         sentence_logits = self.sentence_classifier(pooled_embeddings).squeeze(-1)
-        sentence_logits = utils.mask_tensor(sentence_logits, selected_sentence_mask.detach())
+        sentence_logits = util.mask_tensor(sentence_logits, selected_sentence_mask.detach())
         return sentence_logits, combined_sentence_embeddings, combined_sentence_len
 
     def _sentence_selection(self, cur_embedding, cur_emb_len, sentences, sentence_lens, selected_sentence_mask,
@@ -73,18 +73,18 @@ class BertSequentialReasoningSingleEncoding(nn.Module):
         combined_sentence_len = cur_emb_len.unsqueeze(1) + sentence_lens
         pooled_embeddings = combined_sentence_embeddings / combined_sentence_len
         sentence_logits = self.sentence_classifier(pooled_embeddings).squeeze(-1)
-        sentence_logits = utils.mask_tensor(sentence_logits, selected_sentence_mask.detach())
+        sentence_logits = util.mask_tensor(sentence_logits, selected_sentence_mask.detach())
 
         num_sentences = combined_sentence_embeddings.size(1)
 
         if self.training:
             if self.config.teacher_forcing and fact_label is not None:
-                one_hot = utils.convert_to_one_hot(fact_label, num_sentences)
+                one_hot = util.convert_to_one_hot(fact_label, num_sentences)
             else:
                 one_hot = F.gumbel_softmax(sentence_logits, tau=0.8, hard=True)
         else:
             one_hot = torch.argmax(sentence_logits, dim=-1)
-            one_hot = utils.convert_to_one_hot(one_hot, num_sentences)
+            one_hot = util.convert_to_one_hot(one_hot, num_sentences)
 
         if one_hot[0][-1] != 1:  # ONLY FOR BATCH SIZE 1
             selected_sentence_mask = (1 - one_hot) * selected_sentence_mask
@@ -129,7 +129,7 @@ class BertSequentialReasoningSingleEncoding(nn.Module):
                 break
 
         selected_sentences_one_hot = selected_sentences_one_hot.clamp(max=1)
-        attention_mask = utils.convert(sentence_indicator, selected_sentences_one_hot).type(torch.long)
+        attention_mask = util.convert(sentence_indicator, selected_sentences_one_hot).type(torch.long)
 
         input_ids = features['input_ids'] * (attention_mask) + (1 - attention_mask) * self.tokenizer.pad_token_id
 

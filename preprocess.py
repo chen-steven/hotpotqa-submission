@@ -38,7 +38,14 @@ def get_all_one_hot(tokens, text, ans, i=None):
 
 
 def get_examples(file_path, paras_file):
-    paras = json.load(open(paras_file, 'r'))
+    multihop_paras = json.load(open(paras_file, 'r'))
+    paras = {}
+    for key in multihop_paras:
+        entry = []
+        for l in multihop_paras[key]:
+            entry.extend(l)
+        paras[key] = entry
+    
     sentence2title = defaultdict(list)
     examples = []
     with open(file_path, 'r', encoding='utf-8') as f:
@@ -110,6 +117,7 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset-file', type=str)
+    parser.add_argument('--paras-file', type=str)
     args = parser.parse_args()
-    examples = get_examples(args.dataset_file, "data/paras.json")
-    build_hotpot_single_encoding_features(examples, "data/features_fixed.pkl")
+    examples = get_examples(args.dataset_file, args.paras_file)
+    build_hotpot_single_encoding_features(examples, "data/features_fixed3.pkl")

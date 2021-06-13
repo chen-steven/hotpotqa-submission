@@ -2,13 +2,13 @@ from model import BertSequentialReasoningSingleEncoding
 from dataset import OneStepBaselineDataset
 from torch.utils.data import DataLoader
 import torch
-import utils
+import util
 from transformers import RobertaTokenizerFast, AutoConfig
 import torch.nn.functional as F
 from tqdm import tqdm
 import json
 
-utils.set_device(0)
+util.set_device(0)
 def generate_predictions(args):
     config = AutoConfig.from_pretrained('roberta-large')
     config.teacher_forcing = False
@@ -22,7 +22,7 @@ def generate_predictions(args):
     sentence2title = json.load(open('data/sentence2para.json', 'r'))
     tokenizer = RobertaTokenizerFast.from_pretrained('roberta-large')
     model = BertSequentialReasoningSingleEncoding(config)
-    model.load_state_dict(torch.load('data/model.pt', map_location="cpu"))
+    model.load_state_dict(torch.load('data_processed/model.pt', map_location="cpu"))
     model.eval()
     model.cuda()
     dataset = OneStepBaselineDataset(args.features_file)
@@ -36,7 +36,7 @@ def generate_predictions(args):
 
             batch_size = s_logits.size(0)
 
-            start_idxs, end_idxs = utils.discretize(F.softmax(s_logits, dim=-1), F.softmax(e_logits, dim=-1))
+            start_idxs, end_idxs = util.discretize(F.softmax(s_logits, dim=-1), F.softmax(e_logits, dim=-1))
             for i in range(batch_size):
                 start, end = start_idxs[i], end_idxs[i]
                 pred_ans = tokenizer.decode(features['input_ids'][i].tolist()[start: end + 1])
@@ -50,7 +50,7 @@ def generate_predictions(args):
                 all_predictions['answer'][ids[i]] = pred_ans
                 all_predictions['sp'][ids[i]] = pred_supporting_facts
 
-    json.dump(all_predictions, open('predict_fixed_data.json', 'w'))
+    json.dump(all_predictions, open('predict_fixed_data.json1', 'w'))
 
 
 if __name__ == "__main__":
