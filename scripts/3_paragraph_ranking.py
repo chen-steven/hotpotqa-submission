@@ -209,7 +209,7 @@ if __name__ == "__main__":
                                           num_labels=num_labels,
                                           finetuning_task=args.task_name,
                                           cache_dir="feature_extraction_cache")
-    tokenizer = tokenizer_class.from_pretrained(args.tokenizer_name if args.tokenizer_name else args.model_name_or_path,
+    tokenizer = tokenizer_class.from_pretrained(args.tokenizer_name if args.tokenizer_name else 'roberta-large',
                                                 do_lower_case=args.do_lower_case)
 
     # Load a trained model that you have fine-tuned

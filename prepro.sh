@@ -16,7 +16,6 @@ OUTPUT_PROCESSED=$DATA_ROOT/dataset/data_processed/$DATA_TYPE
 #wget -P $DATA_ROOT/dataset/data_raw/ http://curtis.ml.cmu.edu/datasets/hotpot/hotpot_dev_distractor_v1.json
     
 echo "1. Extract Wiki Link & NER from DB"
-#python extract_db.py $INPUT_FILE ./data/knowledge/ner.db $OUTPUT_PROCESSED/doc_link_ner.json
 echo $OUTPUT_PROCESSED/doc_link_ner.json
 python scripts/1_extract_db.py $INPUT_FILE data/knowledge/enwiki_ner.db $OUTPUT_PROCESSED/doc_link_ner.json
 
