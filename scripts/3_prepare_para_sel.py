@@ -10,7 +10,7 @@ input_data = json.load(open(input_file, 'r'))
 labels, titles, contexts, questions = [], [], [], []
 
 for data in input_data:
-    gold_paras = [para for para , _  in data['supporting_facts']]
+    gold_paras = [para for para , _  in data['context']]
     for entity, sentences in data['context']:
         label = int(entity in gold_paras)
         title = entity
