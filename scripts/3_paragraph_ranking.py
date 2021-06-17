@@ -196,7 +196,7 @@ if __name__ == "__main__":
     args = set_args()
 
     # Setup CUDA
-    args.device = torch.device("cuda:1" if torch.cuda.is_available() and not args.no_cuda else "cpu")
+    args.device = torch.device("cuda:0" if torch.cuda.is_available() and not args.no_cuda else "cpu")
     torch.cuda.set_device(args.device)
     processor = processors[args.task_name]()
     args.output_mode = output_modes[args.task_name]
