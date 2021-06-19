@@ -214,7 +214,7 @@ if __name__ == "__main__":
 
     # Load a trained model that you have fine-tuned
     print(args.device)
-    model_state_dict = torch.load(args.eval_ckpt, map_location="cuda:1")
+    model_state_dict = torch.load(args.eval_ckpt, map_location="cuda:0")
     model = model_class.from_pretrained(args.model_name_or_path,
                                         config=config,
                                         state_dict=model_state_dict,

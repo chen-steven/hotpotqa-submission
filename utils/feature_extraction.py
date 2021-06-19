@@ -77,7 +77,7 @@ class HotpotQAProcessor(object):
             guid = "%s-%s" % (set_type, i)
             text_a = row['question']
             text_b = '{} {}'.format(row['context'], row['title'])
-            label = row['label']
+            label = 0
             examples.append(
                 InputExample(guid=guid, text_a=text_a, text_b=text_b, label=label))
         return examples
