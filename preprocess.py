@@ -78,7 +78,7 @@ def get_examples(file_path, paras_file):
 
 
 def build_hotpot_single_encoding_features(examples, filename):
-    tokenizer = RobertaTokenizerFast.from_pretrained('roberta-large')
+    tokenizer = RobertaTokenizerFast.from_pretrained("roberta-large", cache_dir="transformers_cache")
     ids = []
     full_context = []
     sentence_indicators = []
@@ -119,4 +119,4 @@ if __name__ == "__main__":
     parser.add_argument('--paras-file', type=str)
     args = parser.parse_args()
     examples = get_examples(args.dataset_file, args.paras_file)
-    build_hotpot_single_encoding_features(examples, "data/features.pkl")
+    build_hotpot_single_encoding_features(examples, "features.pkl")

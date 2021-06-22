@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from transformers import AutoModel, AutoTokenizer
+from transformers import AutoModel, AutoTokenizer, RobertaModel
 import torch.nn.functional as F
 import util
 from transformers import RobertaConfig
@@ -20,7 +20,7 @@ class BertSequentialReasoningSingleEncoding(nn.Module):
     def __init__(self, config):
         super(BertSequentialReasoningSingleEncoding, self).__init__()
         self.config = config
-        self.bert = AutoModel.from_pretrained('roberta-large')
+        self.bert = RobertaModel.from_pretrained("data/models/finetuned/PS") #AutoModel.from_pretrained('roberta-large')
         self.dropout = nn.Dropout()
 
         self.sentence_classifier = nn.Sequential(nn.Linear(config.hidden_size, config.hidden_size // 2), nn.ReLU(),
