@@ -72,8 +72,8 @@ def get_examples(file_path, paras_file):
                        "context_sent": context_sents}
             examples.append(example)
 
-    json.dump(sentence2title, open(f'data/sentence2para.json', 'w'))
-    json.dump(example, open(f'data/examples.json', 'w'))
+    json.dump(sentence2title, open(f'sentence2para.json', 'w'))
+    json.dump(example, open(f'examples.json', 'w'))
     return examples
 
 
