@@ -10,7 +10,7 @@ import json
 
 util.set_device(0)
 def generate_predictions(args):
-    config = AutoConfig.from_pretrained('roberta-large')
+    config = AutoConfig.from_pretrained('roberta-large', cache_dir="transformers_cache")
     config.teacher_forcing = False
     config.oracle = False
     config.num_chains = 4
@@ -20,7 +20,7 @@ def generate_predictions(args):
     config.beam_search = False
 
     sentence2title = json.load(open(args.sentence_map, 'r'))
-    tokenizer = RobertaTokenizerFast.from_pretrained('roberta-large')
+    tokenizer = RobertaTokenizerFast.from_pretrained('roberta-large', cache_dir="transformers_cache")
     model = BertSequentialReasoningSingleEncoding(config)
     model.load_state_dict(torch.load('model.pt', map_location="cpu"))
     model.eval()
