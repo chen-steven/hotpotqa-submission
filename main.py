@@ -19,7 +19,7 @@ def generate_predictions(args):
     config.mask_context_embedding = False
     config.beam_search = False
 
-    sentence2title = json.load(open('data/sentence2para.json', 'r'))
+    sentence2title = json.load(open(args.sentence_map, 'r'))
     tokenizer = RobertaTokenizerFast.from_pretrained('roberta-large')
     model = BertSequentialReasoningSingleEncoding(config)
     model.load_state_dict(torch.load('model.pt', map_location="cpu"))
@@ -57,6 +57,7 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('--features-file', type=str)
+    parser.add_argument('--sentence-map', type=str)
     args = parser.parse_args()
     generate_predictions(args)
 
