@@ -111,12 +111,47 @@ def build_hotpot_single_encoding_features(examples, filename):
                 ids=ids)
     pickle.dump(data, open(filename, 'wb'))
 
+def build_ropes_one_step_features(examples, filename):
+    tokenizer = RobertaTokenizerFast.from_pretrained('roberta-large')
+    ids = []
+    full_context = []
+    sentence_indicators = []
+    for example in examples:
+        ids.append(example['id'])
+        context_sentences = example['context_sent']
+        question = example['question']
+
+        input_text = question
+        for i, sent in enumerate(context_sentences):
+            input_text += ' {} {}'.format(tokenizer.sep_token, sent)
+        full_context.append(input_text)
+
+    features = tokenizer(full_context, truncation=True)
+    for i, example in tqdm(enumerate(examples)):
+        sentence_indicator = [0] * len(features['input_ids'][i])
+        sent_idx = 0
+        for idx, x in enumerate(features['input_ids'][i]):
+            if x == tokenizer.sep_token_id:
+                sent_idx += 1
+            sentence_indicator[idx] = sent_idx
+        sentence_indicators.append(sentence_indicator)
+
+    data = dict(features=features,
+                sentence_indicators=sentence_indicators,
+                ids=ids)
+
+    pickle.dump(data, open("features.pkl", 'wb'))
+
 
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset-file', type=str)
     parser.add_argument('--paras-file', type=str)
+    parser.add_argument('--use-multi-step', action="store_true")
     args = parser.parse_args()
     examples = get_examples(args.dataset_file, args.paras_file)
-    build_hotpot_single_encoding_features(examples, "features.pkl")
+    if args.use_multi_step:
+        build_hotpot_single_encoding_features(examples, "features.pkl")
+    else:
+        build_ropes_one_step_features()
