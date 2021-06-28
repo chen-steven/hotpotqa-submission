@@ -31,7 +31,8 @@ class BertSequentialReasoningSingleEncoding(nn.Module):
             2)
         self.eoc_vector = nn.Parameter(torch.zeros(1, config.hidden_size))
         nn.init.xavier_uniform_(self.eoc_vector)
-        self.tokenizer = AutoTokenizer.from_pretrained('roberta-large')
+        self.pad_id = 1
+#        self.tokenizer = AutoTokenizer.from_pretrained('roberta-large')
 
     def _encode_context(self, features, sentence_indicator):
         sentences = []
@@ -131,7 +132,7 @@ class BertSequentialReasoningSingleEncoding(nn.Module):
         selected_sentences_one_hot = selected_sentences_one_hot.clamp(max=1)
         attention_mask = util.convert(sentence_indicator, selected_sentences_one_hot).type(torch.long)
 
-        input_ids = features['input_ids'] * (attention_mask) + (1 - attention_mask) * self.tokenizer.pad_token_id
+        input_ids = features['input_ids'] * (attention_mask) + (1 - attention_mask) * self.pad_id
 
         outputs = self.bert(input_ids.long(), attention_mask=attention_mask)
         sequence_output = outputs[0]
