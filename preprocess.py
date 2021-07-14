@@ -112,7 +112,7 @@ def build_hotpot_single_encoding_features(examples, filename):
     pickle.dump(data, open(filename, 'wb'))
 
 def build_ropes_one_step_features(examples, filename):
-    tokenizer = RobertaTokenizerFast.from_pretrained('roberta-large')
+    tokenizer = RobertaTokenizerFast.from_pretrained('roberta-large', cache_dir="transformers_cache")
     ids = []
     full_context = []
     sentence_indicators = []

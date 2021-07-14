@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from transformers import AutoModel
+from transformers import AutoModel, RobertaModel
 import util
 
 
@@ -8,7 +8,7 @@ class OneStepSentence(nn.Module):
     def __init__(self, config):
         super(OneStepSentence, self).__init__()
         self.config = config
-        self.bert = AutoModel.from_pretrained('roberta-large', cache_dir="./cache")
+        self.bert = RobertaModel.from_pretrained("data/models/finetuned/PS")
         self.chain_classifier = nn.Sequential(nn.Linear(config.hidden_size, config.hidden_size // 2),
                                                   nn.LeakyReLU(), nn.Linear(config.hidden_size // 2, 1))
         self.qa_output = nn.Linear(2*config.hidden_size, 2)
