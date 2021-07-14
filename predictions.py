@@ -18,7 +18,7 @@ def generate_predictions(args):
     sentence2title = json.load(open(args.sentence_map, 'r'))
     tokenizer = RobertaTokenizerFast.from_pretrained('roberta-large', cache_dir="transformers_cache")
     model = OneStepSentence(config)
-    model.load_state_dict(torch.load('model.pt', map_location="cpu"))
+    model.load_state_dict(torch.load('model_ts.pt', map_location="cpu"))
     model.eval()
     model.cuda()
     dataset = OneStepBaselineDataset(args.features_file)
@@ -29,6 +29,8 @@ def generate_predictions(args):
         for batch in tqdm(dataloader):
             features, sentence_indicators, ids = batch
             s_logits, e_logits, chain_logits = model(features, sentence_indicators)
+            s_logits = s_logits.squeeze(-1)
+            e_logits = e_logits.squeeze(-1)
 
             batch_size = chain_logits.size(0)
             start_idxs, end_idxs = util.discretize(F.softmax(s_logits, dim=-1), F.softmax(e_logits, dim=-1))
@@ -40,7 +42,8 @@ def generate_predictions(args):
                                                            5))[1].detach().cpu().numpy())
                 pred_supporting_facts = []
                 for x in pred_chain:
-                    pred_supporting_facts.append(sentence2title[ids[i]][x])
+                    if x < len(sentence2title[ids[i]]):
+                        pred_supporting_facts.append(sentence2title[ids[i]][x])
                 all_predictions['answer'][ids[i]] = pred_ans
                 all_predictions['sp'][ids[i]] = pred_supporting_facts
 

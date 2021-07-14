@@ -35,6 +35,8 @@ class OneStepSentence(nn.Module):
         output = self.bert(input_ids.long(), attention_mask=att_mask)
         sequence_output = output[0]
 
+        context_embedding = att_mask.unsqueeze(dim=-1)*context_embedding
+
         sequence_output = torch.cat((sequence_output, context_embedding), dim=-1)
 
         logits = self.qa_output(sequence_output)

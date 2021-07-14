@@ -148,6 +148,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset-file', type=str)
     parser.add_argument('--paras-file', type=str)
+    parser.add_argument('--use-two-step', action="store_true")
     args = parser.parse_args()
     examples = get_examples(args.dataset_file, args.paras_file)
-    build_hotpot_single_encoding_features(examples, "features.pkl")
+    if (args.use_two_step):
+        build_ropes_one_step_features(examples, 'features.pkl')
+    else:
+        build_hotpot_single_encoding_features(examples, "features.pkl")
