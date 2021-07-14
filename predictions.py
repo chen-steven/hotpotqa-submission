@@ -13,7 +13,7 @@ util.set_device(0)
 
 def generate_predictions(args):
     config = AutoConfig.from_pretrained('roberta-large', cache_dir="transformers_cache")
-    config.k = 5
+    config.k = 3
 
     sentence2title = json.load(open(args.sentence_map, 'r'))
     tokenizer = RobertaTokenizerFast.from_pretrained('roberta-large', cache_dir="transformers_cache")
